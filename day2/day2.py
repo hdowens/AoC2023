@@ -1,4 +1,6 @@
+import math
 from time import perf_counter
+from collections import defaultdict
 
 def part1(data: list) -> int:
 
@@ -30,23 +32,18 @@ def part1(data: list) -> int:
 
 def part2(data: list) -> int:
     ans = 0
-    for idx, game in enumerate(data):
-        maxs = {
-            "r" : 0,
-            "g" : 0,
-            "b" : 0
-        }
+    for game in data:
+        #use default dict to ignore setting it up + key errors
+        maxs = defaultdict(int)
         turns = game.split(':')[1].split(";")
-        #each turn we need to check if the condition has been violated
-        #will use a flag for now, probs better way to do it though
+
         for turn in turns:
             for item in turn.split(","):
                 num = int(''.join(filter(str.isdigit, item)))
                 col = item[item.find(next(filter(str.isalpha, item)))]
-                if num > maxs[col]:
-                    maxs[col] = num
+                maxs[col] = max(maxs[col], num)
 
-        ans += (maxs['r']*maxs['g']*maxs['b'])
+        ans += math.prod(maxs.values())
             
     return ans
 
@@ -54,6 +51,18 @@ def main():
 
     with open("b:\Programming\Projects\AoC2023\day2\day2.txt" , "r") as puz_input:
         data = puz_input.readlines()
+
+    #---------------------
+    #someone elses soln, some people are cracked
+    #---------------------
+    #def f(line):
+    #    bag = collections.defaultdict(int)
+    #    for num, col in re.findall(r'(\d+) (\w+)', line):
+    #        bag[col] = max(bag[col], int(num))
+    #    return math.prod(bag.values())
+#
+    #print(sum(f(line) for line in data))
+
 
     p1_ans = part1(data)
     p2_ans = part2(data)
