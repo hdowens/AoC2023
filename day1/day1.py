@@ -37,7 +37,7 @@ def main():
         #need to convert string to string w digits now
         string = word2num(string) #- UNCOMMENT THIS LINE FOR PART 2
         dig_list = [(i, c) for i, c in enumerate(string) if c.isdigit()]
-        ans += int(dig_list[0][1] + dig_list[len(dig_list)-1][1])
+        ans += int(dig_list[0][1] + dig_list[-1][1])
 
     return ans
 if __name__ == "__main__":
