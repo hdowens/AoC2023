@@ -1,3 +1,4 @@
+import re
 from time import perf_counter
 
 def main():
@@ -11,185 +12,58 @@ def main():
     #    "...........*..220......*.......757.#..............-270..697..588....461..263......*.......@373....*........464...244...688..............*...",
     #    ".........272..........993.536..............................*............&......961....=..........490..198.....*................181.....236..",
     #]
+#
+    #data = [
+    #    "12.......*..",
+    #    "+.........34",
+    #    ".......-12..",
+    #    "..78........",
+    #    "..*....60...",
+    #    "78.........9",
+    #    ".5.....23..$",
+    #    "8...90*12...",
+    #    "............",
+    #    "2.2......12.",
+    #    ".*.........*",
+    #    "1.1..503+.56",
+    #]
+
+    #data = [
+    #    ".......5......",
+    #    "..7*..*.......",
+    #    "...*13*.......",
+    #    ".......15.....",
+    #]
+
 
     ans = 0
+    p2_ans = 0
 
     #I have no good ideas atm, going to brute force the fuck out of this
-    for row_num, item in enumerate(data):
+    atrks = {}
+
+    for idx, item in enumerate(data):
         item = item.strip()
-        for idx, char in enumerate(item):
-            
-            #special character check
-            if not char.isdigit() and char != '.':
-                #print(f"pos: {idx +1} char: {char} row num: {row_num}")
-                #now need to check adjacents
-                #lhs in the row
-                if idx-1 >= 0 and item[idx-1].isdigit():
-                    num = []
-                    i = 1
-                    while idx-i >= 0 and item[idx-i].isdigit():    
-                        num.append(item[idx-i])
-                        i += 1
-                    ans += int(''.join(i for i in reversed(num)))
+        for ma in re.finditer(r'\d+', item):
+
+            for i in range(max(idx-1, 0), min(idx+2, len(data))):
+                for j in range( max(ma.start()-1, 0), min(ma.end()+1, len(item))):
+
+                    if not data[i][j].isdigit() and data[i][j] != '.':
+                        ans += int(ma.group())
+
+                    if data[i][j] == "*":
+                        try:
+                            num =  atrks[(i,j)]
+                            p2_ans += (int(num) * int(ma.group()))
+                        except KeyError:
+                            atrks[(i,j)] = ma.group()
+                       
 
 
-                ##rhs in the row
-                if idx+1 < len(item) and item[idx+1].isdigit():
-                    num = []
-                    i = 1
-                    while idx+i < len(item) and item[idx+i].isdigit():
-                        num.append(item[idx+i])
-                        i += 1
-                    ans += int(''.join(i for i in num))
-
-
-                #up
-                if row_num > 0:
-
-
-                    #directly above
-                    if data[row_num-1][idx].isdigit():
-
-                        #edge case first
-                        if data[row_num-1][idx-1].isdigit() and data[row_num-1][idx+1].isdigit():
-                            toadd = str(data[row_num-1][idx-1]) + str(data[row_num-1][idx]) + str(data[row_num-1][idx+1])
-                            ans += int(toadd)
-                            print(f"{data[row_num-1][idx-1] + data[row_num-1][idx] + data[row_num-1][idx+1]}")
-
-                        else:
-
-                            #if its just a single digit above rhs col
-                            if idx+1 == len(item) and data[row_num-1][idx-1] == '.':
-                                ans += int(data[row_num-1][idx])
-                                print(f"{data[row_num-1][idx]}")
-
-
-                            #if its just a single digit above lhs col
-                            if idx+1 == 1 and data[row_num-1][idx+1] == '.':
-                                ans += int(data[row_num-1][idx])
-                                print(f"{data[row_num-1][idx]}")
-
-
-                            #top left
-                            if data[row_num-1][idx-1].isdigit():
-                                num = []
-                                i = 0
-                                while idx-i >= 0 and data[row_num-1][idx-i].isdigit():
-                                    #ans += int(f"Num adjacent to char {char}: {item[idx-i]}")
-                                    num.append(int(data[row_num-1][idx-i]))
-                                    i += 1
-                                ans += int(''.join(str(i for i in reversed(num)))
-
-                            
-                            #top right
-                            if idx+i < len(item) and data[row_num-1][idx+1].isdigit():
-                                num = []
-                                i = 0
-                                while idx+i < len(item) and data[row_num-1][idx+i].isdigit():
-                                    #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                    num.append(int(data[row_num-1][idx+i]))
-                                    i += 1
-                                ans += int(''.join(str(i) for i in num))
-
-                    
-                    
-                    #top left
-                    else:
-                        if data[row_num-1][idx-1].isdigit():
-                            num = []
-                            i = 1
-                            while idx-i >= 0 and data[row_num-1][idx-i].isdigit():
-                                #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                num.append(int(data[row_num-1][idx-i]))
-                                i += 1
-                            ans += int(''.join(str(i) for i in reversed(num)))
-
-
-                        #top right
-                        if idx+1 < len(item) and data[row_num-1][idx+1].isdigit():
-                            num = []
-                            i = 1
-                            while idx+i < len(item) and data[row_num-1][idx+i].isdigit():
-                                #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                num.append(int(data[row_num-1][idx+i]))
-                                i += 1
-                            ans += int(''.join(str(i) for i in num))
-
-                
-                #down
-                if row_num+1 < len(data):
-                    #directly below
-                    if data[row_num+1][idx].isdigit():
-
-                        #edge case first
-                        if idx-1 >= 0 and data[row_num+1][idx-1].isdigit() and  idx+i < len(item) and data[row_num+1][idx+1].isdigit():
-                            toadd = str(data[row_num+1][idx-1]) + str(data[row_num+1][idx]) + str(data[row_num+1][idx+1])
-                            ans += int(toadd)
-                            print(f"{data[row_num+1][idx-1] + data[row_num+1][idx] + data[row_num+1][idx+1]}")
-
-
-                        else:
                         
-
-                            #if its just a single digit above in the rhs pos
-                            if idx+1 == len(item) and data[row_num+1][idx-1] == '.':
-                                ans += int(data[row_num+1][idx])
-                                print(f"{data[row_num+1][idx]}")
-
-
-                                                    #if its just a single digit above in the rhs pos
-                            if idx+1 == 1 and data[row_num+1][idx+1] == '.':
-                                ans += int(data[row_num+1][idx])
-                                print(f"{data[row_num+1][idx]}")
-
-
-                            #top left
-                            if data[row_num+1][idx-1].isdigit():
-                                num = []
-                                i = 0
-                                while idx-i >= 0 and data[row_num+1][idx-i].isdigit():
-                                    #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                    num.append(data[row_num+1][idx-i])
-                                    i += 1
-                                ans += int(''.join(i for i in reversed(num)))
-
-                            
-                            #top right
-                            if data[row_num+1][idx+1].isdigit():
-                                num = []
-                                i = 0
-                                while idx+i < len(item) and data[row_num+1][idx+i].isdigit():
-                                    #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                    num.append(int(data[row_num+1][idx+i]))
-                                    i += 1
-                                ans += int(''.join(str(i) for i in num))
-    
-                                
-                    
-                    else:
-                        #top left
-                        if data[row_num+1][idx-1].isdigit():
-                            num = []
-                            i = 1
-                            while idx-i >= 0 and data[row_num+1][idx-i].isdigit():
-                                #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                num.append(int(data[row_num+1][idx-i]))
-                                i += 1
-                            ans += int(''.join(str(i) for i in reversed(num)))
- 
-
-                        #top right
-                        if idx+1 < len(item) and data[row_num+1][idx+1].isdigit():
-                            num = []
-                            i = 1
-                            while idx+i < len(item) and data[row_num+1][idx+i].isdigit():
-                                #print(f"Num adjacent to char {char}: {item[idx-i]}")
-                                num.append(int(data[row_num+1][idx+i]))
-                                i += 1
-                            ans += int(''.join(str(i) for i in num))
-
-
-    return ans
+                              
+    return ans, p2_ans
 
 if __name__ == "__main__":
     st = perf_counter()
