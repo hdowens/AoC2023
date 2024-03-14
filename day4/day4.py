@@ -31,14 +31,8 @@ def main():
         
 
         #part 1
-        part1_score = 0
-        for item in scratchy_nums:
-            if item in win_nums:
-                if part1_score == 0:
-                    part1_score += 1
-                else:
-                    part1_score *= 2
-        part1_ans += part1_score
+        matches =  set(win_nums) & set(scratchy_nums)
+        part1_ans += round(2**(len(matches)-1))
 
         #part 2
         for _ in range(card_count[game_num]):
