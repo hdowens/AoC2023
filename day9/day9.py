@@ -31,6 +31,9 @@ def solve_part2(puz_input: str) -> int:
         for i in range(len(to_extrap)-1, 0, -1):
             #lil bitta dynamic programming spoice - you love to see it
             to_extrap[i-1] = to_extrap[i-1] - to_extrap[i]
+
+        #as the summation happens rhs to lhs, the final answer will be on the very lhs value,
+        #the first value in the list!
         tot += to_extrap[0]
 
     return tot
@@ -43,7 +46,7 @@ def main():
     
     print(f"Answer to part 1 => {solve_part1(puz_input)}")
     print(f"Answer to part 2 => {solve_part2(puz_input)}")
-    
+
 if __name__ == "__main__":
     main()
 

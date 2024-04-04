@@ -1,0 +1,12 @@
+..M.1.M...M..
+..M...M..2M..
+3.M...M...M..
+MMMMMMMMMMMMM
+..M...M...M..
+..M...M.4.M..
+.5M...M...M..
+..M...M...M.6
+MMMMMMMMMMMMM
+..M...M...M..
+..M...M..7M..
+8.M..9M...M..
